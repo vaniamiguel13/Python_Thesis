@@ -1,63 +1,10 @@
-
 import numpy as np
 from HGPSAL.HGPSAL.penalty import penalty2
 from HGPSAL.HGPSAL.GeneticA import rGA
 import copy
 from HGPSAL.HGPSAL.HJ import HJ
-from scipy.optimize import minimize
-from scipy.optimize import LinearConstraint
-from scipy.optimize import NonlinearConstraint
-from scipy.optimize import Bounds
-import random
-
-
-class Problem:
-    def __init__(self, Variables, ObjFunction, LB, UB, Constraints, x0=None):
-        self.Variables = Variables
-        self.x0 = x0
-        self.Constraints = Constraints
-        self.ObjFunction = ObjFunction
-        self.LB = LB
-        self.UB = UB
-        self.m = None
-        self.p = None
-        self.Verbose = False
-        self.Tolerance = 1.0e-6
-        self.GenTest = 0.01
-        self.Stats = ProblemStatistics()
-
-
-class ProblemStatistics:
-    def __init__(self):
-        self.exit = None
-        self.objfun = None
-        self.x = None
-        self.fx = None
-        self.c = None
-        self.ceq = None
-        self.history = None
-        self.Evaluations = 0
-        self.Iterations = 0
-        self.StopFlag = ''
-        self.Message = ''
-        self.ObjFunCounter = 0
-        self.GenCounter = 0
-        self.Best = []
-        self.Worst = []
-        self.Mean = []
-        self.Std = []
-
-
-class alg:
-    def __init__(self):
-        self.lbmd = None
-        self.ldelta = None
-        self.miu = None
-        self.alfa = None
-        self.omega = None
-        self.epsilon = None
-        self.eta = None
-        self.delta = None
+from HGPSAL.HGPSAL.AUX_Class.Problem_C import Problem
+from HGPSAL.HGPSAL.AUX_Class.Alg_C import alg
 
 
 def lag(x, Problem, alg):
@@ -359,11 +306,12 @@ def HGPSAL(Problem, Options=None, *args):
         norma_lambda = np.linalg.norm(alg.lmbd)
         norma_x = np.linalg.norm(x)
 
-        alg.ldelta = np.maximum(lambda_min, np.minimum(np.maximum(0, alg.ldelta + c / alg.miu),lambda_max))
+        alg.ldelta = np.maximum(lambda_min, np.minimum(np.maximum(0, alg.ldelta + c / alg.miu), lambda_max))
 
         if max_i <= alg.eta * (1 + norma_x) and v <= alg.eta * (1 + norma_lambda):
 
-            if alg.epsilon < epsilon_asterisco and max_i <= eta_asterisco * (1 + norma_x) and v <= eta_asterisco * (1 + norma_lambda) and global_search == False:
+            if alg.epsilon < epsilon_asterisco and max_i <= eta_asterisco * (1 + norma_x) and v <= eta_asterisco * (
+                    1 + norma_lambda) and global_search == False:
                 stats.Message = 'HGPSAL: Tolerance of constraints violations satisfied.'
                 print(stats.Message)
                 break
@@ -378,7 +326,7 @@ def HGPSAL(Problem, Options=None, *args):
             alg.miu = max(min(alg.miu * csi, pow(alg.miu, teta_miu)), miu_min)
             alg.alfa = min(alg.miu, gama1)
             alg.omega = omega0 * pow(alg.alfa, alfaw)
-            alg.epsilon = alg.omega * mega_(alg.lmbd , alg.ldelta, alg.miu, teta_tol)
+            alg.epsilon = alg.omega * mega_(alg.lmbd, alg.ldelta, alg.miu, teta_tol)
             alg.eta = eta0 * pow(alg.alfa, alfa_eta)
             global_search = True
 
@@ -410,16 +358,15 @@ def Rast_constr(x):
 LB = [-5, -5]
 UB = [5, 5]
 
-InitialPopulation = [
-    {'x': [-3, 2]},
-    {'x': [1, -4]},
-    {'x': [-2, 3]}
-]
+# InitialPopulation = [
+#     {'x': [-3, 2]},
+#     {'x': [1, -4]},
+#     {'x': [-2, 3]}
+# ]
 
-myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100,50])
+myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
 # InitialGuess1 = InitialGuess(np.array([0, 0]))
 # InitialGuess2 = InitialGuess(np.array([1, 1]))
 
 
-
-print(HGPSAL(myProblem)[5].exit)
+print(HGPSAL(myProblem))

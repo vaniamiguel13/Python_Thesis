@@ -1,9 +1,8 @@
-import numpy as np
 import math
-
 import numpy as np
+from HGPSAL.HGPSAL.AUX_Class.Population_C import Popul
+from HGPSAL.HGPSAL.AUX_Class.Problem_C import Problem
 
-import numpy as np
 
 def Bounds(X, L, U):
     for _ in range(len(X)):
@@ -13,85 +12,17 @@ def Bounds(X, L, U):
             X[_] = U[_]
     return X
 
-import numpy as np
-
-import numpy as np
-
-#
-# def Bounds(X, L, U):
-#     # check if X is a list of arrays
-#     if isinstance(X[0], np.ndarray):
-#         for i in range(len(X)):
-#             X[i] = np.clip(X[i], L[i], U[i])
-#     else:
-#         for i in range(len(X)):
-#             if X[i] < L[i]:
-#                 X[i] = L[i]
-#             if X[i] > U[i]:
-#                 X[i] = U[i]
-#     return X
-
 
 def ObjEval(P, x, *args):
     P.Stats.ObjFunCounter += 1
     return P, P.ObjFunction(x, *args)
 
 
-class Popul:
-    def __init__(self, x, f):
-        self.x = x
-        self.f = f
-
-
-class ProblemStatistics:
-    def __init__(self):
-        self.Evaluations = 0
-        self.Iterations = 0
-        self.StopFlag = ''
-        self.Message = ''
-        self.ObjFunCounter = 0
-        self.GenCounter = 0
-        self.Best = []
-        self.Worst = []
-        self.Mean = []
-        self.Std = []
-
-
-class Problem:
-    def __init__(self, Variables, ObjFunction, LB, UB):
-        self.Variables = Variables
-        self.ObjFunction = ObjFunction
-        self.LB = LB
-        self.UB = UB
-        self.Verbose = False
-        self.Tolerance = 1.0e-6
-        self.GenTest = 0.01
-        self.Stats = ProblemStatistics()
-
-
-# def InitPopulation(Problem, InitialPopulation, Size, *args):
-#     Popl = Popul(np.zeros((Size, Problem.Variables)), np.zeros(Size))
-#     for i in range(len(InitialPopulation)):
-#
-#         Popl.x[i, :] = Bounds(InitialPopulation, Problem.LB[:Problem.Variables], Problem.UB[:Problem.Variables])
-#         Problem, Popl.f[i] = ObjEval(Problem, Popl.x[i, :], *args)
-#
-#     for i in range(len(InitialPopulation), Size):
-#         Popl.x[i, :] = np.array(Problem.LB[:Problem.Variables]) + (
-#                 np.array(Problem.UB[:Problem.Variables]) - np.array(Problem.LB[:Problem.Variables])) * np.random.rand(
-#             Problem.Variables)
-#         Problem, Popl.f[i] = ObjEval(Problem, Popl.x[i, :], *args)
-#
-#     Popl.f = Popl.f.reshape(-1, 1)
-#
-#     return Problem, Popl
-
 def InitPopulation(Problem, InitialPopulation, Size, *args):
     Population = Popul
     # Population = type('Population', (), {'x': None, 'f': None})()  # create a Population object
     Population.x = np.zeros((Size, Problem.Variables))
     Population.f = np.zeros(Size, )
-
 
     # Check for size
     if len(InitialPopulation) > Size:
@@ -236,18 +167,6 @@ def rGA(Problem, InitialPopulation=None, Options=None, *args):
     Problem.Stats.Mean.append(np.mean(Population.f))
     Problem.Stats.Std.append(np.std(Population.f))
 
-    # while Problem.Stats.GenCounter < MaxGenerations and Problem.Stats.ObjFunCounter < MaxEvals:
-    #     # Stop if the improvement is inferior to the Tolerance in the last generations
-    #     if Problem.Stats.GenCounter > 0 and (
-    #             not Problem.Stats.GenCounter % math.ceil(Problem.GenTest * MaxGenerations)) and abs(
-    #         Problem.Stats.Best[
-    #             Problem.Stats.GenCounter + 1] - Problem.Stats.Best[Problem.Stats.GenCounter + 1 -
-    #                                                                math.ceil(
-    #                                                                    Problem.GenTest * MaxGenerations)]) < Problem.Tolerance:
-    #         print(
-    #             'Stopping due to objective function improvement inferior to CPTolerance in the last CPGenTest '
-    #             'generations')
-    #         break
     while Problem.Stats.GenCounter < MaxGenerations and Problem.Stats.ObjFunCounter < MaxEvals:
         # Stop if the improvement is inferior to the Tolerance in the last generations
         if Problem.Stats.GenCounter > 0 and (
@@ -304,11 +223,6 @@ def rGA(Problem, InitialPopulation=None, Options=None, *args):
     return BestChrom, BestChromObj, RunData
 
 
-class InitialGuess:
-    def __init__(self, x):
-        self.x = x
-
-
 Variables = 2
 
 
@@ -325,8 +239,8 @@ myProblem = Problem(Variables, Rastrigin, LB, UB)
 # InitialGuess2 = InitialGuess(np.array([1, 1]))
 
 
-
-# R=rGA(myProblem, InitialPopulation=InitialPopulation, Options=None)
+R = rGA(myProblem, InitialPopulation=None, Options=None)
+print(R)
 # print(R[2].ObjFunCounter)
 
 # Problem, Population = InitPopulation(myProblem, InitialPopulation, PopSize)

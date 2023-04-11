@@ -1,58 +1,6 @@
 import numpy as np
-import math
-import time
-
-
-def TicTocGenerator():
-    # Generator that returns time differences
-    ti = 0  # initial time
-    tf = time.time()  # final time
-    while True:
-        ti = tf
-        tf = time.time()
-        yield tf - ti  # returns the time difference
-
-
-TicToc = TicTocGenerator()  # create an instance of the TicTocGen generator
-
-
-# This will be the main function through which we define both tic() and toc()
-def toc(tempBool=True):
-    # Prints the time difference yielded by generator instance TicToc
-    tempTimeInterval = next(TicToc)
-    if tempBool:
-        print("Elapsed time: %f seconds.\n" % tempTimeInterval)
-
-
-def tic():
-    # Records a time in TicToc, marks the beginning of a time interval
-    toc(False)
-
-
-class Problem:
-    def __init__(self, Variables, ObjFunction, LB, UB):
-        self.Variables = Variables
-        self.ObjFunction = ObjFunction
-        self.LB = LB
-        self.UB = UB
-        self.Verbose = False
-        self.Tolerance = 1.0e-6
-        self.GenTest = 0.01
-        self.Stats = ProblemStatistics()
-
-
-class ProblemStatistics:
-    def __init__(self):
-        self.Evaluations = 0
-        self.Iterations = 0
-        self.StopFlag = ''
-        self.Message = ''
-        self.ObjFunCounter = 0
-        self.GenCounter = 0
-        self.Time = 0
-        self.Algorithm = None
-
-
+from HGPSAL.HGPSAL.Time import tic, toc
+from HGPSAL.HGPSAL.AUX_Class.Problem_C import Problem
 def Projection(Problem, x):
     for i in range(Problem.Variables):
         if x[i] < Problem.LB[i]:
