@@ -28,6 +28,7 @@ class ProblemStatistics:
         self.StopFlag = ''
         self.Message = ''
         self.ObjFunCounter = 0
+        self.ConCounter = 0
         self.GenCounter = 0
         self.Algorithm = None
         self.Best = []

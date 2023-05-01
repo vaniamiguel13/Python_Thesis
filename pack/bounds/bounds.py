@@ -129,6 +129,7 @@ def bounds(init, param):
     UB = [row[1] for row in LBUB]
 
     return LB, UB
-
-
-print(bounds(i_val(read_csv('D:/Mestrado/2ano/Tese/code/datasets/initial_val.csv'))[0], parameters(read_csv('D:/Mestrado/2ano/Tese/code/param.csv'))))
+#
+#
+# print(bounds(i_val(read_csv('D:/Mestrado/2ano/Tese/code/datasets/initial_val.csv'))[0],
+#                    parameters(read_csv('D:/Mestrado/2ano/Tese/code/param.csv'))))[0]

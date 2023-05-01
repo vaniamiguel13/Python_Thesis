@@ -29,7 +29,8 @@ def parameters(data, CSV: bool = True):
     return param
 
 
-dt_param=(parameters(read_csv('D:/Mestrado/2ano/Tese/code/param.csv')))
-par=list(dt_param.values())
+dt_param = (parameters(read_csv('D:/Mestrado/2ano/Tese/code/param.csv')))
+print(dt_param)
+par = list(dt_param.values())
 print(par)
 # print(parameters(dic, True))

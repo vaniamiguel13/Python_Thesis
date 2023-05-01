@@ -222,25 +222,25 @@ def rGA(Problem, InitialPopulation=None, Options=None, *args):
 
     return BestChrom, BestChromObj, RunData
 
-
-Variables = 2
-
-
-def Rastrigin(x):
-    f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
-    return f
-
-
-LB = [-5, -5]
-UB = [5, 5]
-
-myProblem = Problem(Variables, Rastrigin, LB, UB)
-# InitialGuess1 = InitialGuess(np.array([0, 0]))
-# InitialGuess2 = InitialGuess(np.array([1, 1]))
+#
+# Variables = 2
+#
+#
+# def Rastrigin(x):
+#     f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
+#     return f
 
 
-R = rGA(myProblem, InitialPopulation=None, Options=None)
-print(R)
+# LB = [-5, -5]
+# UB = [5, 5]
+#
+# myProblem = Problem(Variables, Rastrigin, LB, UB)
+# # InitialGuess1 = InitialGuess(np.array([0, 0]))
+# # InitialGuess2 = InitialGuess(np.array([1, 1]))
+#
+#
+# R = rGA(myProblem, InitialPopulation=None, Options=None)
+# print(R)
 # print(R[2].ObjFunCounter)
 
 # Problem, Population = InitPopulation(myProblem, InitialPopulation, PopSize)

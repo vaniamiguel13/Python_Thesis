@@ -186,9 +186,9 @@ def HGPSAL(Problem, Options=None, *args):
     if delta == 0:
         for j in range(Problem.Variables):
             if x0 is None or x0[j] == 0:
-                alg.delta.append(gama)
+                np.append(alg.delta, gama)
             else:
-                alg.delta.append(x0[j] * gama)
+                np.append(alg.delta, x0[j] * gama)
     elif delta == 1:
         alg.delta = np.ones(Problem.Variables)
     else:
@@ -200,8 +200,9 @@ def HGPSAL(Problem, Options=None, *args):
     stats.objfun = 0
     stats.x = [x]
     stats.fx = [fx]
-    stats.c = [c] if c else []
-    stats.ceq = [ceq] if ceq else []
+    stats.c = np.array(c) if len(np.array(c)) != 0 else []
+    stats.ceq = np.array(ceq) if len(np.array(ceq)) != 0 else []
+
     # stats.history = {}
     # d_it = {}
     global_search = True
@@ -283,9 +284,9 @@ def HGPSAL(Problem, Options=None, *args):
         stats.fx.append(fx)
 
         if len(c):
-            stats.c.append(c)
+            np.append(stats.c, c)
         if len(ceq):
-            stats.ceq.append(ceq)
+            np.append(stats.ceq, ceq)
 
         # if opt.verbose:
         #     print(x)
@@ -294,12 +295,12 @@ def HGPSAL(Problem, Options=None, *args):
         #     print(ceq)
         #     print(la)
         # # ------------------------------------
-
-        if not alg.lmbd and not alg.delta:
+        if np.size(alg.lmbd) == 0 and np.size(alg.delta) == 0:
             break
 
         max_i = max(abs(ceq))
-        v = max(max(c), max(alg.ldelta * abs(c))) if c else 0
+        v = np.maximum(max(c), max(alg.ldelta * abs(c))) if c else 0
+
         if not max_i:
             max_i = 0
 
@@ -317,8 +318,8 @@ def HGPSAL(Problem, Options=None, *args):
                 break
             else:
 
-                alg.lmbd = max(lambda_min, min(alg.lmbd + ceq / alg.miu, lambda_max))
-                alg.alfa = min(alg.miu, gama1)
+                alg.lmbd = np.maximum(lambda_min, np.minimum(alg.lmbd + ceq / alg.miu, lambda_max))
+                alg.alfa = np.minimum(alg.miu, gama1)
                 alg.omega = alg.omega * pow(alg.alfa, betaw)
                 alg.epsilon = alg.omega * mega_(alg.lmbd, alg.ldelta, alg.miu, teta_tol)
                 alg.eta = alg.eta * pow(alg.alfa, beta_eta)
@@ -341,22 +342,22 @@ def HGPSAL(Problem, Options=None, *args):
     return x, fx, c, ceq, la, stats
 
 
-Variables = 2
+# Variables = 2
 
 
-def Rastrigin(x):
-    f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
-    return f
+# def Rastrigin(x):
+#     f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
+#     return f
+#
+#
+# def Rast_constr(x):
+#     c = [(x[0] - 2.5) ** 2 + (x[1] - 2.5) ** 2 - 4]
+#     ceq = [x[0] + x[1] - 7, x[1] * x[0] - 7]
+#     return np.array(c), np.array(ceq)
 
-
-def Rast_constr(x):
-    c = [(x[0] - 2.5) ** 2 + (x[1] - 2.5) ** 2 - 4]
-    ceq = [x[0] + x[1] - 7]
-    return np.array(c), np.array(ceq)
-
-
-LB = [-5, -5]
-UB = [5, 5]
+#
+# LB = [-5, -5]
+# UB = [5, 5]
 
 # InitialPopulation = [
 #     {'x': [-3, 2]},
@@ -364,9 +365,9 @@ UB = [5, 5]
 #     {'x': [-2, 3]}
 # ]
 
-myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
+# myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
 # InitialGuess1 = InitialGuess(np.array([0, 0]))
 # InitialGuess2 = InitialGuess(np.array([1, 1]))
 
-
-print(HGPSAL(myProblem))
+#
+# print(HGPSAL(myProblem))

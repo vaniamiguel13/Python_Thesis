@@ -21,7 +21,6 @@ def InitPopulation(Problem, InitialPopulation, Size, *args):
             Population['x'][i, :] = Problem['LB'][:Problem['Variables']] + (
                     Problem['UB'][:Problem['Variables']] - Problem['LB'][:Problem['Variables']]) * np.random.rand(1,Problem['Variables'])
 
-
             Problem, Population['f'][i] = ObjEval(Problem, Population['x'][i, :], *args)
     Population['f'] = Population['f'].T
     return Problem, Population
