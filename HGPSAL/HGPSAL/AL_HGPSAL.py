@@ -298,7 +298,7 @@ def HGPSAL(Problem, Options=None, *args):
         if np.size(alg.lmbd) == 0 and np.size(alg.delta) == 0:
             break
 
-        max_i = max(abs(ceq))
+        max_i = max(abs(ceq)) if ceq else 0
         v = np.maximum(max(c), max(alg.ldelta * abs(c))) if c else 0
 
         if not max_i:
@@ -342,22 +342,24 @@ def HGPSAL(Problem, Options=None, *args):
     return x, fx, c, ceq, la, stats
 
 
-# Variables = 2
+Variables = 2
 
 
-# def Rastrigin(x):
-#     f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
-#     return f
-#
-#
-# def Rast_constr(x):
-#     c = [(x[0] - 2.5) ** 2 + (x[1] - 2.5) ** 2 - 4]
-#     ceq = [x[0] + x[1] - 7, x[1] * x[0] - 7]
-#     return np.array(c), np.array(ceq)
+def Rastrigin(x):
+    f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
+    return f
 
-#
-# LB = [-5, -5]
-# UB = [5, 5]
+
+def Rast_constr(x):
+    # c = [(x[0] - 2.5) ** 2 + (x[1] - 2.5) ** 2 - 4]
+    # ceq = [x[0] + x[1] - 7, x[1] * x[0] - 7]
+    ceq = []
+    c = []
+    return np.array(c), np.array(ceq)
+
+
+LB = [-5, -5]
+UB = [5, 5]
 
 # InitialPopulation = [
 #     {'x': [-3, 2]},
@@ -365,9 +367,9 @@ def HGPSAL(Problem, Options=None, *args):
 #     {'x': [-2, 3]}
 # ]
 
-# myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
+myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
 # InitialGuess1 = InitialGuess(np.array([0, 0]))
 # InitialGuess2 = InitialGuess(np.array([1, 1]))
 
 #
-# print(HGPSAL(myProblem))
+print(HGPSAL(myProblem))

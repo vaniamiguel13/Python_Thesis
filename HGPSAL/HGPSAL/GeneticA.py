@@ -22,7 +22,7 @@ def InitPopulation(Problem, InitialPopulation, Size, *args):
     Population = Popul
     # Population = type('Population', (), {'x': None, 'f': None})()  # create a Population object
     Population.x = np.zeros((Size, Problem.Variables))
-    Population.f = np.zeros(Size, )
+    Population.f = np.zeros(Size,)
 
     # Check for size
     if len(InitialPopulation) > Size:
@@ -35,7 +35,7 @@ def InitPopulation(Problem, InitialPopulation, Size, *args):
         Problem, Population.f[i] = ObjEval(Problem, Population.x[i, :], *args)
 
     # Randomly generate the remaining population
-    for i in range(len(InitialPopulation), Size):
+    for i in range(len(InitialPopulation)+1, Size):
         Population.x[i, :] = np.array(Problem.LB[:Problem.Variables]) + \
                              (np.array(Problem.UB[:Problem.Variables]) - np.array(
                                  Problem.LB[:Problem.Variables])) * np.random.rand(Problem.Variables)
@@ -131,7 +131,8 @@ def genetic_operator(Problem, parent_chromosome, pc, pm, mu, mum):
         child[p + 1] = child_2[0:V]
         p = p + 2
 
-    return child
+    Popul_x = child
+    return Popul_x
 
 
 def rGA(Problem, InitialPopulation=None, Options=None, *args):

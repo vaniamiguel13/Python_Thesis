@@ -1,11 +1,13 @@
 class Problem:
-    def __init__(self, Variables, ObjFunction, LB, UB, Constraints=None, x0=None):
+    def __init__(self, Variables, ObjFunction, LB, UB, Constraints=None, x0=None, Variables_C = 0, Variables_Ceq = 0):
         self.Variables = Variables
         self.ObjFunction = ObjFunction
         self.LB = LB
         self.UB = UB
         self.Constraints = Constraints
         self.x0 = x0
+        self.L_c = Variables_C
+        self.L_ceq = Variables_Ceq
         self.m = None
         self.p = None
         self.Verbose = False
@@ -23,6 +25,8 @@ class ProblemStatistics:
         self.c = None
         self.ceq = None
         self.history = None
+        self.N1Front = []
+        self.NFronts = []
         self.Evaluations = 0
         self.Iterations = 0
         self.StopFlag = ''
@@ -36,3 +40,4 @@ class ProblemStatistics:
         self.Mean = []
         self.Std = []
         self.Time = 0
+
