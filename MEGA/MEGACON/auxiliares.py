@@ -15,8 +15,8 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
     Population.Fitness = np.zeros((Size,))
 
 
-    if InitialPopulation and not isinstance(InitialPopulation, dict):
-        raise ValueError('Initial population must be defined in a dictionary.')
+    if InitialPopulation and not isinstance(InitialPopulation, list):
+        raise ValueError('Initial population must be defined in a list.')
     elif len(InitialPopulation) > Size:
         raise ValueError('Initial population size must be inferior to PopSize.')
     else:

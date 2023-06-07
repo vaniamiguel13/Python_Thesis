@@ -241,7 +241,7 @@ def zdt1_con(x):
 P = Problem(Variables=2, ObjFunction=zdt1, LB=[0,0], UB=[1,1], Constraints=zdt1_con, Variables_C = 2, Variables_Ceq = 1)
 
 Options = {'PopSize': 5, 'CTol': 1e-4, 'CeqTol': 1e-4, 'MaxGen': 50}
-Test = MegaCon(P, [], Options)
+Test = MegaCon(P, [-100,10], Options)
 print(Test[0])
 print(Test[1])
 print(Test[2])
