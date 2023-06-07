@@ -231,13 +231,14 @@ def zdt1(x):
 
 
 def zdt1_con(x):
-    c = [x[0] ** 2 - 0.5], [x[0] ** 2 + x[1]]
+    c = [x[0] ** 2 - 0.5, x[0] ** 2 + x[1]]
     # c=[]
-    ceq = [x[0] ** 8], [x[1]]
+    # ceq = [x[0] ** 8, x[1]]
+    ceq = []
     return np.array(c), np.array(ceq)
 
 
-P = Problem(Variables=2, ObjFunction=zdt1, LB=[0,0], UB=[1,1], Constraints=zdt1_con, Variables_C = 2, Variables_Ceq = 2)
+P = Problem(Variables=2, ObjFunction=zdt1, LB=[0,0], UB=[1,1], Constraints=zdt1_con, Variables_C = 2, Variables_Ceq = 1)
 
 Options = {'PopSize': 5, 'CTol': 1e-4, 'CeqTol': 1e-4, 'MaxGen': 50}
 Test = MegaCon(P, [], Options)

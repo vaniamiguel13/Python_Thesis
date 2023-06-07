@@ -64,12 +64,15 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
             if NormCons == 1:
                 maxc = np.maximum(0, Population.c).min(axis=0)
                 # maxc = min(np.maximum(0, Population.c))
-                # if maxc == 0:
-                #     maxc = np.array([0])
-                print(maxc)
-                for j in range(len(maxc)):
-                    if maxc[j] == 0:
-                        maxc[j] = 1
+
+                if isinstance(maxc, int):
+                    if maxc == 0:
+                        maxc = np.array([1])
+                else:
+                    for j in range(len(maxc)):
+                        if maxc[j] == 0:
+                            maxc[j] = 1
+
                 maxceq = Population.ceq.min(axis=0)
                 # maxceq = min(Population.ceq)
                 if type(maxceq) == list or type(maxceq) == np.ndarray:
@@ -79,7 +82,7 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
                             maxceq[j] = 1
                 else:
                     if maxceq == 0:
-                        maxceq = 1
+                        maxceq = np.array([1])
                 # print(maxc)
                 # print(maxceq)
                 c_norm = (np.linalg.norm(np.maximum([0], Population.c[i]) / maxc,
@@ -307,8 +310,21 @@ def RankPopulation(Population, elite, sigma, NormType):
     for i in range(len(IP)):
 
         Population.Rank[IP[i]] = rank
-        Population.Fitness[IP[i]] = fk + np.linalg.norm(np.maximum(0, Population.c[i]), NormType) + np.linalg.norm(
-            np.abs(Population.ceq[i]), NormType)
+        print(type(Population.ceq[i]))
+        if isinstance(Population.c[i], np.int32) and isinstance(Population.ceq[i], np.int32):
+            Population.Fitness[IP[i]] = fk + np.linalg.norm(np.maximum(0, [Population.c[i]]), NormType) + np.linalg.norm(
+                np.abs([Population.ceq[i]]), NormType)
+        elif isinstance(Population.c[i], np.int32) and isinstance(Population.ceq[i], np.ndarray):
+            Population.Fitness[IP[i]] = fk + np.linalg.norm(np.maximum(0, [Population.c[i]]),
+                                                            NormType) + np.linalg.norm(
+                np.abs(Population.ceq[i]), NormType)
+
+        elif isinstance(Population.c[i], np.ndarray) and isinstance(Population.ceq[i], np.int32):
+            Population.Fitness[IP[i]] = fk + np.linalg.norm(np.maximum(0, [Population.c[i]]), NormType) + np.linalg.norm(
+                np.abs([Population.ceq[i]]), NormType)
+        else:
+            Population.Fitness[IP[i]] = fk + np.linalg.norm(np.maximum(0, Population.c[i]), NormType) + np.linalg.norm(
+                np.abs(Population.ceq[i]), NormType)
 
     return Population
 
