@@ -39,7 +39,7 @@ def HGPSAL(Problem, Options=None, *args):
                   'pop_size': 40, 'elite_prop': 0.1, 'tour_size': 2, 'pcross': 0.9, 'icross': 20, 'pmut': 0.1,
                   'imut': 20,
                   'gama': 1, 'delta': 1, 'teta': 0.5, 'eta_asterisco': 1.0e-2, 'epsilon_asterisco': 1.0e-6,
-                  'cp_ga_test': 0.1, 'cp_ga_tol': 1.0e-6, 'delta_tol': 1e-6, 'maxit': 100, 'maxet': 200,
+                  'cp_ga_test': 0.1, 'cp_ga_tol': 1.0e-6, 'delta_tol': 1e-6, 'maxit': 200, 'maxet': 200,
                   'max_objfun': 20000, 'verbose': False}
 
     # With no arguments just print an error
@@ -171,7 +171,7 @@ def HGPSAL(Problem, Options=None, *args):
     if Problem.p == 0:
         alg.ldelta = []
     else:
-        alg.ldelta = np.ones(Problem.p)
+        alg.ldelta = np.ones((1, Problem.p))
 
     # Initialize
 
@@ -298,11 +298,23 @@ def HGPSAL(Problem, Options=None, *args):
         if np.size(alg.lmbd) == 0 and np.size(alg.delta) == 0:
             break
 
-        max_i = max(abs(ceq)) if ceq else 0
-        v = np.maximum(max(c), max(alg.ldelta * abs(c))) if c else 0
+        if ceq.any():
+            max_i = np.max(np.abs(ceq))
 
-        if not max_i:
+        else:
             max_i = 0
+
+        if c.any():
+
+            v = np.maximum(np.max(c), np.max(alg.ldelta * np.abs(c)))
+            print(v)
+        else:
+            v = 0
+        # max_i = max(abs(ceq)) if ceq else 0
+        # v = np.maximum(max(c), max(alg.ldelta * abs(c))) if c else 0
+
+        # if not max_i:
+        #     max_i = 0
 
         norma_lambda = np.linalg.norm(alg.lmbd)
         norma_x = np.linalg.norm(x)
@@ -351,10 +363,10 @@ def Rastrigin(x):
 
 
 def Rast_constr(x):
-    # c = [(x[0] - 2.5) ** 2 + (x[1] - 2.5) ** 2 - 4]
-    # ceq = [x[0] + x[1] - 7, x[1] * x[0] - 7]
-    ceq = []
-    c = []
+    c = [(x[0] - 25) ** 2 + (x[1] - 25) ** 2 - 100]
+    ceq = [x[0] + x[1] - 7, x[1] * x[0] - 7]
+    # ceq = []
+    # c = []
     return np.array(c), np.array(ceq)
 
 
@@ -372,4 +384,5 @@ myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
 # InitialGuess2 = InitialGuess(np.array([1, 1]))
 
 #
+
 print(HGPSAL(myProblem))
