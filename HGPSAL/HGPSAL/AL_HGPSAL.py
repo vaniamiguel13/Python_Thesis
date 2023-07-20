@@ -384,5 +384,5 @@ myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
 # InitialGuess2 = InitialGuess(np.array([1, 1]))
 
 #
-
-print(HGPSAL(myProblem))
+#
+# print(HGPSAL(myProblem))

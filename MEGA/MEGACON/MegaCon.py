@@ -5,7 +5,7 @@ from HGPSAL.HGPSAL.AUX_Class.Problem_C import Problem
 from HGPSAL.HGPSAL.AUX_Class.Population_C import Popul
 
 
-def MegaCon(Problem, InitialPopulation, Options, *args):
+def MegaCon(Problem, InitialPopulation = None, Options= None, *args):
     DefaultOpt = {'MaxObj': 2000, 'MaxGen': 1000, 'PopSize': 40, 'Elite': 0.1, 'TourSize': 2, 'Pcross': 0.9,
                   'Icross': 20, 'Pmut': 0.1, 'Imut': 20, 'Sigma': 0.1,
                   'CPTolerance': 1.0e-6, 'CPGenTest': 0.01, 'CTol': 1e-2, 'CeqTol': 1e-2, 'NormType': np.inf,
@@ -25,7 +25,6 @@ def MegaCon(Problem, InitialPopulation, Options, *args):
     MaxEvals = Options['MaxObj'] if Options and 'MaxObj' in Options else DefaultOpt['MaxObj']
     Pop = Options['PopSize'] if Options and 'PopSize' in Options else DefaultOpt['PopSize']
     Elite = Options['Elite'] if Options and 'Elite' in Options else DefaultOpt['Elite']
-
     elite_inf = max(2, math.ceil(Elite / 2 * Pop))
     elite_sup = min(Pop - 2, math.floor((1 - Elite / 2) * Pop))
     print(f"MEGA: MEGA elite size set to the interval {elite_inf} and {elite_sup}")
@@ -34,7 +33,7 @@ def MegaCon(Problem, InitialPopulation, Options, *args):
     Pc = Options['Pcross'] if Options and 'Pcross' in Options else DefaultOpt['Pcross']
     Ic = Options['Icross'] if Options and 'Icross' in Options else DefaultOpt['Icross']
 
-    if 'Pmut' not in Options:
+    if Options is None or 'Pmut' not in Options:
         Pm = 1 / Problem.Variables
         print(f"MEGA: MEGA mutation probability set to {Pm}")
     else:
@@ -42,7 +41,7 @@ def MegaCon(Problem, InitialPopulation, Options, *args):
 
     Im = Options['Imut'] if Options and 'Imut' in Options else DefaultOpt['Imut']
 
-    if 'Sigma' not in Options:
+    if Options is None or 'Sigma' not in Options:
         print(f"MEGA: MEGA niching radius will be adapted during the search {Pm}")
         sigma = 0
     else:
@@ -100,22 +99,20 @@ def MegaCon(Problem, InitialPopulation, Options, *args):
 
     Problem.Stats.N1Front.append(len(Population.Rank[Population.Rank == 1]))
     Problem.Stats.NFronts.append(max(Population.Rank))
+    if Problem.Verbose:
+        print('MEGA is running... ')
+        if np.sum(Population.Feasible) == 0:
+            best_point_norm = np.linalg.norm(np.maximum(0, Population.c[0]), NormType) + np.linalg.norm(
+                np.abs(Population.ceq[0]), NormType)
+            print(
+                f"Gen: {Problem.Stats.GenCounter }  No. points in 1st front = {Problem.Stats.N1Front[Problem.Stats.GenCounter]}  Number of fronts = {Problem.Stats.NFronts[Problem.Stats.GenCounter]}  All points are unfeasible. Best point: {best_point_norm}")
+        else:
+            print(
+                f"Gen: {Problem.Stats.GenCounter}  No. points in 1st front = {Problem.Stats.N1Front[Problem.Stats.GenCounter]}  Number of fronts = {Problem.Stats.NFronts[Problem.Stats.GenCounter]}")
 
     while Problem.Stats.GenCounter < MaxGenerations and Problem.Stats.ObjFunCounter < MaxEvals:
         # Increment generation counter.
-        Problem.Stats.GenCounter += 1
-
-        # Select the parents
-        # Parents are selected for reproduction to generate offspring. The arguments are
-        # pool - size of the mating pool. It is common to have this to be equal to the
-        #        population size. However, if elistm is intended then pool must
-        #        be inferior to the population size, i.e., pool=pop-elitesize.
-        #        Typically, 10% percent of population size.
-        # tour - Tournament size. For binary tournament
-        #        selection set tour=2, but to see the effect of tournament size in the selection pressure this is kept
-        #        arbitary, to be choosen by the user.
-        # elitesize = round(Pop*Elite);
-        # pool = Pop - elitesize;
+        Problem.Stats.GenCounter = Problem.Stats.GenCounter + 1
 
         if Elite is not None:
             pool = math.floor(
@@ -142,9 +139,14 @@ def MegaCon(Problem, InitialPopulation, Options, *args):
         for i in range(Pop - pool, Pop):
             Problem, Population.f[i, :] = ObjEval(Problem, Population.x[i, :], *args)
             if Conflag == True:
-                Problem = ConEval(Problem, Population.x[i, :], *args)[0]
-                Population.c[i] = np.transpose(ConEval(Problem, Population.x[i, :], *args)[1])
-                Population.ceq[i] = np.transpose(ConEval(Problem, Population.x[i, :], *args)[2])
+
+                results = ConEval(Problem, Population.x[i, :], *args)
+                Problem = results[0]
+                Population.c[i] = np.transpose(results[1])
+                Population.ceq[i] = np.transpose(results[2])
+                # Problem = ConEval(Problem, Population.x[i, :], *args)[0]
+                # Population.c[i] = np.transpose(ConEval(Problem, Population.x[i, :], *args)[1])
+                # Population.ceq[i] = np.transpose(ConEval(Problem, Population.x[i, :], *args)[2])
             else:
                 Population.c[i, :] = 0
                 Population.ceq[i, :] = 0
@@ -179,7 +181,6 @@ def MegaCon(Problem, InitialPopulation, Options, *args):
                 (Population.x, Population.f, Population.c, Population.ceq, Population.Feasible.reshape((-1, 1)),
                  Population.Rank.reshape((-1, 1)), Population.Fitness.reshape((-1, 1))))
             temp = temp[temp[:, -1].argsort()]
-
             Population.x = temp[:, :Population.x.shape[1]]
             Population.f = temp[:, Population.x.shape[1]:Population.x.shape[1] + Population.f.shape[1]]
             Population.c = temp[:,
@@ -196,9 +197,23 @@ def MegaCon(Problem, InitialPopulation, Options, *args):
 
             # Problem.Stats.N1Front[Problem.Stats.GenCounter + 1] = np.sum(Population.Rank == 1)
             # Problem.Stats.NFronts[Problem.Stats.GenCounter + 1] = np.max(Population.Rank)
-            Problem.Stats.N1Front.append(len(Population.Rank[Population.Rank == 1]))
+            # Problem.Stats.N1Front.append(len(Population.Rank[Population.Rank == 1]))
+            Problem.Stats.N1Front.append(len([x for x in Population.Rank if x == 1]))
             Problem.Stats.NFronts.append(max(Population.Rank))
+            if Problem.Verbose:
+                print('MEGA is running... ')
+                if np.sum(Population.Feasible) == 0:
+                    best_point_norm = np.linalg.norm(np.maximum(0, Population.c[0]), NormType) + np.linalg.norm(
+                        np.abs(Population.ceq[0]), NormType)
+                    print(
+                        f"Gen: {Problem.Stats.GenCounter}  No. points in 1st front = {Problem.Stats.N1Front[Problem.Stats.GenCounter]}  Number of fronts = {Problem.Stats.NFronts[Problem.Stats.GenCounter]}  All points are unfeasible. Best point: {best_point_norm}")
+                else:
+                    print(
+                        f"Gen: {Problem.Stats.GenCounter}  No. points in 1st front = {Problem.Stats.N1Front[Problem.Stats.GenCounter]}  Number of fronts = {Problem.Stats.NFronts[Problem.Stats.GenCounter]}")
 
+    print(Problem.Stats.GenCounter)
+    print(Problem.Stats.ObjFunCounter)
+    print(Problem.Stats.ConCounter)
     toc()
 
     if Problem.Stats.GenCounter >= MaxGenerations or Problem.Stats.ObjFunCounter >= MaxEvals:
@@ -222,27 +237,26 @@ def MegaCon(Problem, InitialPopulation, Options, *args):
     return NonDomPoint, FrontPoint_f, FrontPoint_c, FrontPoint_ceq, RunData
 
 
-def zdt1(x):
-    f = np.zeros(2)
-    f[0] = x[0]
-    g = 1 + 9 * np.sum(x[1:]) / (len(x) - 1)
-    f[1] = g * (1 - np.sqrt(x[0] / g))
-    return f
-
-
-def zdt1_con(x):
-    c = [x[0] ** 2 - 0.5, x[0] ** 2 + x[1]]
-    # c=[]
-    # ceq = [x[0] ** 8, x[1]]
-    ceq = []
-    return np.array(c), np.array(ceq)
-
-
-P = Problem(Variables=2, ObjFunction=zdt1, LB=[0,0], UB=[1,1], Constraints=zdt1_con, Variables_C = 2, Variables_Ceq = 1)
-
-Options = {'PopSize': 5, 'CTol': 1e-4, 'CeqTol': 1e-4, 'MaxGen': 50}
-Test = MegaCon(P, [-100,10], Options)
-print(Test[0])
-print(Test[1])
-print(Test[2])
-print(Test[3])
+# def zdt1(x):
+#     f = np.zeros(2)
+#     f[0] = x[0]
+#     g = 1 + 9 * np.sum(x[1:]) / (len(x) - 1)
+#     f[1] = g * (1 - np.sqrt(x[0] / g))
+#     return f
+#
+#
+# def zdt1_con(x):
+#     c = [x[0] ** 2 - 0.5, x[0] ** 2 + x[1]]
+#     # c=[]
+#     ceq = [x[0] ** 8, x[1]]
+#     # ceq = []
+#     return np.array(c), np.array(ceq)
+#
+# P = Problem(Variables=2, ObjFunction=zdt1, LB=[0,0], UB=[1,1], Constraints=zdt1_con, Variables_C = 2, Variables_Ceq = 2)
+#
+# Options = {'PopSize': 20, 'CTol': 1e-4, 'CeqTol': 1e-4, 'MaxGen': 100, 'Verbosity': True}
+# Test = MegaCon(P, [], Options)
+# print(Test[0])
+# print(Test[1])
+# print(Test[2])
+# print(Test[3])
