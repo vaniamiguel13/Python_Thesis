@@ -1,8 +1,6 @@
 import math
 import numpy as np
 from HGPSAL.HGPSAL.AUX_Class.Population_C import Popul
-from HGPSAL.HGPSAL.AUX_Class.Problem_C import Problem
-
 
 def Bounds(X, L, U):
     for _ in range(len(X)):
@@ -223,39 +221,3 @@ def rGA(Problem, InitialPopulation=None, Options=None, *args):
 
     return BestChrom, BestChromObj, RunData
 
-#
-# Variables = 2
-#
-#
-# def Rastrigin(x):
-#     f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
-#     return f
-
-
-# LB = [-5, -5]
-# UB = [5, 5]
-#
-# myProblem = Problem(Variables, Rastrigin, LB, UB)
-# # InitialGuess1 = InitialGuess(np.array([0, 0]))
-# # InitialGuess2 = InitialGuess(np.array([1, 1]))
-#
-#
-# R = rGA(myProblem, InitialPopulation=None, Options=None)
-# print(R)
-# print(R[2].ObjFunCounter)
-
-# Problem, Population = InitPopulation(myProblem, InitialPopulation, PopSize)
-
-# %%
-# def test_obj(x):
-#     return np.sum(x[0] ** 2 + x[1])
-#
-#
-#
-#
-# Problem = Problem(2, test_obj, np.array([-5.12, -5.12]), np.array([5.12, 5.12]))
-#
-# InitialPopulation = [InitialGuess(np.array([0.5, 0.5])), InitialGuess(np.array([-0.5, -0.5]))]
-# Size = 20
-# Problem, Population = InitPopulation(Problem, InitialPopulation, Size)
-# print(Population.x)

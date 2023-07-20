@@ -1,4 +1,3 @@
-import math
 import numpy as np
 
 
@@ -23,7 +22,6 @@ def penalty2(Problem, x, alg):
 
 
 def ObjEval(Problem, x, *args):
-
     ObjValue = Problem.ObjFunction(x)
     return ObjValue
 

@@ -7,7 +7,6 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
     x = np.zeros((Size, Problem.Variables))
     f = np.zeros((Size, 2))
     Population = Popul(x, f)
-    # Population.c = np.zeros(Size, dtype=int)
     Population.c = [0] * Size
     Population.ceq = [0] * Size
     Population.Feasible = np.zeros((Size,))
@@ -23,17 +22,13 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
             x = InitialPopulation
             Population.x[i, :] = bounds(x, Problem.LB[:Problem.Variables], Problem.UB[:Problem.Variables])
             Problem, Population.f[i] = ObjEval(Problem, Population.x[i, :], *args)
+
             if Conflag:
-                # Problem = ConEval(Problem, Population.x[i, :], *args)[0]
-                # Population.c[i] = ConEval(Problem, Population.x[i, :], *args)[1]
-                # Population.ceq[i] = ConEval(Problem, Population.x[i, :], *args)[2]
-                results = ConEval(Problem, Population.x[i, :], *args)
-                Problem = results[0]
-                Population.c[i] = results[1]
-                Population.ceq[i] = results[2]
+                C_eval = ConEval(Problem, Population.x[i, :], *args)
+                Problem = C_eval[0]
+                Population.c[i] = C_eval[1]
+                Population.ceq[i] = C_eval[2]
 
-
-            #                Population.Feasible[i] = (np.linalg.norm(np.maximum(0, Population.c[i,:])) <= CTol) and (np.linalg.norm(np.abs(Population.ceq[i,:])) <= CeqTol)
             else:
                 Population.c = Population.c
                 Population.ceq = Population.ceq
@@ -46,18 +41,13 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
                              (np.array(Problem.UB[:Problem.Variables]) - np.array(
                                  Problem.LB[:Problem.Variables])) * np.random.rand(Problem.Variables)
         Problem, Population.f[i, :] = ObjEval(Problem, Population.x[i, :], *args)
-        if Conflag:
-            results = ConEval(Problem, Population.x[i, :], *args)
-            Problem = results[0]
-            Population.c[i] = results[1]
-            Population.ceq[i] = results[2]
-            # Problem = ConEval(Problem, Population.x[i, :], *args)[0]
-            #
-            # Population.c[i] = ConEval(Problem, Population.x[i, :], *args)[1]
-            #
-            # Population.ceq[i] = ConEval(Problem, Population.x[i, :], *args)[2]
 
-        #            Population.Feasible[i] = (np.linalg.norm(np.maximum(0, Population.c[i,:])) <= CTol) and (np.linalg.norm(np.abs(Population.ceq[i,:])) <= CeqTol)
+        if Conflag:
+            C_eval = ConEval(Problem, Population.x[i, :], *args)
+            Problem = C_eval[0]
+            Population.c[i] = C_eval[1]
+            Population.ceq[i] = C_eval[2]
+
         else:
             Population.c = np.append(Population.c, 0)
             Population.ceq = np.append(Population.ceq, 0)
@@ -69,7 +59,6 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
         for i in range(Size):
             if NormCons == 1:
                 maxc = np.maximum(0, Population.c).min(axis=0)
-                # maxc = min(np.maximum(0, Population.c))
 
                 if isinstance(maxc, int):
                     if maxc == 0:
@@ -80,7 +69,7 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
                             maxc[j] = 1
 
                 maxceq = Population.ceq.min(axis=0)
-                # maxceq = min(Population.ceq)
+
                 if type(maxceq) == list or type(maxceq) == np.ndarray:
 
                     for j in range(len(maxceq)):
@@ -89,35 +78,19 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
                 else:
                     if maxceq == 0:
                         maxceq = np.array([1])
-                # print(maxc)
-                # print(maxceq)
+
                 c_norm = (np.linalg.norm(np.maximum([0], Population.c[i]) / maxc,
                                          ord=NormType))
-                # print(c_norm)
 
                 ceq_norm = (np.linalg.norm(np.abs(Population.ceq[i]) / np.abs(maxceq),
                                            ord=NormType))
-                # print(ceq_norm)
+
                 Population.Feasible[i] = c_norm <= CTol and ceq_norm <= CeqTol
-                # print(Population.Feasible[i])
-                # Population.Feasible[i] = (np.linalg.norm(np.maximum(0, Population.c) / maxc,
-                #                                          ord=NormType) <= CTol) and (
-                #                                      np.linalg.norm(np.abs(Population.ceq) / np.abs(maxceq),
-                #                                                     ord=NormType) <= CeqTol)
-                # print(Population.Feasible[i])
+
             else:
 
                 Population.Feasible[i] = (np.linalg.norm(np.maximum(0, Population.c), ord=NormType) <= CTol) and (
                         np.linalg.norm(np.abs(Population.ceq), ord=NormType) <= CeqTol)
-                # c_norm = np.linalg.norm(np.maximum(0, Population.c[i]) / maxc)
-                # ceq_norm = np.linalg.norm(np.abs(Population.ceq[i]) / np.abs(maxceq))
-                # Population.Feasible[i] = (c_norm <= CTol) and (ceq_norm <= CeqTol)
-
-            # else:
-            #
-            #     c_norm = np.linalg.norm(np.maximum(0, Population.c), ord=NormType, axis=1)
-            #     ceq_norm = np.linalg.norm(np.abs(Population.ceq), ord=NormType, axis=1)
-            #     Population.Feasible = (c_norm <= CTol) & (ceq_norm <= CeqTol)
 
     Population.Feasible = Population.Feasible.T
     Population.Rank = Population.Rank.T
@@ -126,25 +99,6 @@ def InitPopulation(Problem, InitialPopulation, Size, Conflag, CTol, CeqTol, Norm
     return Problem, Population
 
 
-# def ConEval(Problem, x, *args):
-#     Problem.Stats.ConCounter += 1
-#
-#     try:
-#         res = Problem.Constraints(x, *args)
-#         c = res[0]
-#         ceq = res[1]
-#         print(len(ceq))
-#         if len(res[0]) == 0:
-#             c = 0
-#         if len(res[1]) == 0:
-#             ceq = 0
-#         else:
-#             raise ValueError('The constraints function must return one or two outputs.')
-#     except Exception as e:
-#         raise Exception(
-#             'Cannot continue because user supplied function constraints failed with the following error:\n%s' % str(e))
-#
-#     return Problem, c, ceq
 def ConEval(Problem, x, *args):
     Problem.Stats.ConCounter += 1
 
@@ -187,12 +141,6 @@ def share(dist, sigma):
 
 
 def nondom(P, nv):
-    # INPUT: matriz P -> n x (m+nv)
-    #                    n -> numero de pontos
-    #                    m -> numero de objectivos
-    #        escalar nv -> numero de variaveis
-    # OUTPUT: matriz PL -> nl x (m+nv)
-    #                    nl -> numero de pontos nao dominados
 
     n = P.shape[0]  # numero de pontos
     m = P.shape[1] - nv  # numero de objectivos
@@ -212,12 +160,6 @@ def nondom(P, nv):
 
 
 def cnondom(P, nv, F, C):
-    # INPUT: matriz P -> n x (m+nv)
-    #                    n -> numero de pontos
-    #                    m -> numero de objectivos
-    #        escalar nv -> numero de variaveis
-    # OUTPUT: matriz PL -> nl x (m+nv)
-    #                    nl -> numero de pontos nao dominados
 
     n = P.shape[0]  # numero de pontos
     m = P.shape[1] - nv  # numero de objectivos
@@ -258,79 +200,6 @@ def dom(x, y):
     return 0  # x nao domina y
 
 
-# def RankPopulation(Population, elite, sigma, NormType):
-#     pop, obj = Population.f.shape
-#     # compute rank
-#     IP = np.where(Population.Feasible == 1)[0]
-#     P = np.hstack((Population.f[IP], IP.reshape((-1, 1))))
-#
-#     rank = 1
-#     while P.shape[0] > 0:
-#         ND = nondom(P, 1)  # não dominadas e indices
-#         # P = np.setdiff1d(P, ND, assume_unique=True)
-#         P = P[~np.isin(P, ND).all(1)]
-#
-#         for i in range(ND.shape[0]):
-#             pos = int(ND[i, obj])
-#             Population.Rank[pos] = rank
-#         rank += 1
-#
-#     I = np.where(Population.Rank == 1)[0]
-#     if len(I) > 0:
-#         ideal = np.min(Population.f[I, :], axis=0)
-#         J = np.argmin(Population.f[I, :], axis=0)
-#         if sigma == 0:
-#             nadir = np.max(Population.f[I], axis=0)
-#             dnorm = np.linalg.norm(nadir - ideal)
-#             if dnorm == 0:
-#                 dnorm = np.linalg.norm(np.max(Population.f, axis=0) - np.min(Population.f, axis=0))
-#             sigma = 2 * dnorm * (pop - np.floor(elite * pop / 2) - 1) ** (-1 / (obj - 1))
-#
-#     fk = 1
-#     if sigma != 0:
-#         frente = 1
-#         while frente < rank:
-#             I = np.where(Population.Rank == frente)[0]
-#             LI = len(I)
-#             for i in range(LI):
-#                 if I[i] not in J:
-#                     nc = 0
-#                     for j in range(LI):
-#                         nc += share(np.linalg.norm(Population.f[I[i]] - Population.f[I[j]]), sigma)
-#                     Population.Fitness[I[i]] = fk * nc
-#                 else:
-#                     Population.Fitness[I[i]] = fk
-#             fk = np.floor(np.max(Population.Fitness[I])) + 1
-#             frente += 1
-#     else:
-#         Population.Fitness = Population.Rank
-#
-#     # unfeasible
-#     IP = np.where(Population.Feasible == 0)[0]
-#     for i in range(len(IP)):
-#         Population.Rank[IP[i]] = rank
-#
-#         if isinstance(Population.c[i], np.int32):
-#             Population.c[i] = np.float(Population.c[i])
-#
-#         if isinstance(Population.ceq[i], np.int32):
-#             Population.ceq[i] = np.float(Population.ceq[i])
-#
-#         c_norm = np.linalg.norm(np.maximum(0, Population.c[i]), NormType)
-#         ceq_norm = np.linalg.norm(np.abs(Population.ceq[i]), NormType)
-#         # print(fk)
-#         # print(c_norm + ceq_norm)
-#
-#         Population.Fitness[IP[i]] = np.float64(fk + c_norm + ceq_norm)
-#
-#     return Population
-
-#estaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa abaixo
-
-
-
-#AQUIIIII
-
 def RankPopulation(Population, elite, sigma, NormType):
     pop, obj = Population.f.shape
     # compute rank
@@ -352,8 +221,7 @@ def RankPopulation(Population, elite, sigma, NormType):
     if len(I) > 0:
         ideal = np.min(Population.f[I, :], axis=0)
         J = np.argmin(Population.f[I, :], axis=0)
-        # ideal = np.min(Population.f[I], axis=0)
-        # J = np.argmin(Population.f[I], axis=0)
+
         if sigma == 0:
             nadir = np.max(Population.f[I], axis=0)
             dnorm = np.linalg.norm(nadir - ideal)
@@ -401,19 +269,11 @@ def RankPopulation(Population, elite, sigma, NormType):
                 np.abs([Population.ceq[i]]), NormType)
         else:
 
-            # Assuming Population.ceq[i] is a numpy array
-            # ceq_norm = Decimal(np.sum(np.abs(Population.ceq[i]) ** NormType) ** (1 / NormType))
-
-            # Population.Fitness[IP[i]] = ceq_norm
             Population.Fitness[IP[i]] = (np.linalg.norm(np.abs(Population.ceq[i]), NormType))
             Population.Fitness[IP[i]] += float(fk)
             Population.Fitness[IP[i]] += np.linalg.norm(np.maximum(0, (Population.c[i])), NormType)
 
     return Population
-
-
-from decimal import Decimal
-from scipy.linalg import norm
 
 
 def tournament_selection(chromosomes, pool_size, tour_size):
@@ -499,7 +359,7 @@ def genetic_operator(Problem, parent_chromosome, pc, pm, mu, mum):
         p = p + 2
 
     Popul_x = child
-    # print(Popul_x)
+
     return Popul_x
 
 

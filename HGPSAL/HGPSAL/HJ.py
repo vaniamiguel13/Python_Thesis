@@ -1,6 +1,5 @@
 import numpy as np
 from HGPSAL.HGPSAL.Time import tic, toc
-from HGPSAL.HGPSAL.AUX_Class.Problem_C import Problem
 def Projection(Problem, x):
     for i in range(Problem.Variables):
         if x[i] < Problem.LB[i]:
@@ -120,26 +119,3 @@ def HJ(Problem, x0, delta = None, Options = None, *args):
     RunData = Problem.Stats
 
     return x, fx, RunData
-
-# Variables = 2
-#
-#
-# def Rastrigin(x):
-#     f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
-#     return f
-
-
-# LB = [-5, -5]
-# UB = [5, 5]
-
-# myProblem = Problem(Variables, Rastrigin, LB, UB)
-# InitialGuess1 = InitialGuess(np.array([0, 0]))
-# InitialGuess2 = InitialGuess(np.array([1, 1]))
-
-# InitialPopulation = [
-#     {'x': [-3, 2]},
-#     {'x': [1, -4]},
-# ]
-
-#
-# print(HJ(myProblem, x0=[100, 100], Options=None))

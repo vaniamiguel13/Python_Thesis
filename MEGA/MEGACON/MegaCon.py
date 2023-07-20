@@ -99,6 +99,7 @@ def MegaCon(Problem, InitialPopulation = None, Options= None, *args):
 
     Problem.Stats.N1Front.append(len(Population.Rank[Population.Rank == 1]))
     Problem.Stats.NFronts.append(max(Population.Rank))
+
     if Problem.Verbose:
         print('MEGA is running... ')
         if np.sum(Population.Feasible) == 0:
@@ -138,15 +139,13 @@ def MegaCon(Problem, InitialPopulation = None, Options= None, *args):
         # Evaluate the objective function
         for i in range(Pop - pool, Pop):
             Problem, Population.f[i, :] = ObjEval(Problem, Population.x[i, :], *args)
-            if Conflag == True:
 
-                results = ConEval(Problem, Population.x[i, :], *args)
-                Problem = results[0]
-                Population.c[i] = np.transpose(results[1])
-                Population.ceq[i] = np.transpose(results[2])
-                # Problem = ConEval(Problem, Population.x[i, :], *args)[0]
-                # Population.c[i] = np.transpose(ConEval(Problem, Population.x[i, :], *args)[1])
-                # Population.ceq[i] = np.transpose(ConEval(Problem, Population.x[i, :], *args)[2])
+            if Conflag:
+                C_eval = ConEval(Problem, Population.x[i, :], *args)
+                Problem = C_eval[0]
+                Population.c[i] = np.transpose(C_eval[1])
+                Population.ceq[i] = np.transpose(C_eval[2])
+
             else:
                 Population.c[i, :] = 0
                 Population.ceq[i, :] = 0
@@ -236,27 +235,3 @@ def MegaCon(Problem, InitialPopulation = None, Options= None, *args):
 
     return NonDomPoint, FrontPoint_f, FrontPoint_c, FrontPoint_ceq, RunData
 
-
-# def zdt1(x):
-#     f = np.zeros(2)
-#     f[0] = x[0]
-#     g = 1 + 9 * np.sum(x[1:]) / (len(x) - 1)
-#     f[1] = g * (1 - np.sqrt(x[0] / g))
-#     return f
-#
-#
-# def zdt1_con(x):
-#     c = [x[0] ** 2 - 0.5, x[0] ** 2 + x[1]]
-#     # c=[]
-#     ceq = [x[0] ** 8, x[1]]
-#     # ceq = []
-#     return np.array(c), np.array(ceq)
-#
-# P = Problem(Variables=2, ObjFunction=zdt1, LB=[0,0], UB=[1,1], Constraints=zdt1_con, Variables_C = 2, Variables_Ceq = 2)
-#
-# Options = {'PopSize': 20, 'CTol': 1e-4, 'CeqTol': 1e-4, 'MaxGen': 100, 'Verbosity': True}
-# Test = MegaCon(P, [], Options)
-# print(Test[0])
-# print(Test[1])
-# print(Test[2])
-# print(Test[3])

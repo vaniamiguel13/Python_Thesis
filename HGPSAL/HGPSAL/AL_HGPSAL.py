@@ -72,14 +72,6 @@ def HGPSAL(Problem, Options=None, *args):
     if Problem.Constraints is None or Problem.Constraints == []:
         raise ValueError('Function constraints are missing.')
 
-    # If no options passed in, set default options
-    # if Options is None:
-    #     pop_size = min(20 * Problem.Variables, 200)
-    #     print(f"HGPSAL: rGA population size set to {pop_size}")
-    #     pmut = 1 / Problem.Variables
-    #     print(f"HGPSAL: rGA mutation probability set to {pmut}")
-    # else:
-
     beta_eta = Options['beta_eta'] if Options and 'beta_eta' in Options else DefaultOpt['beta_eta']
     eta_asterisco = Options['eta_asterisco'] if Options and 'eta_asterisco' in Options else DefaultOpt[
         'eta_asterisco']
@@ -105,15 +97,12 @@ def HGPSAL(Problem, Options=None, *args):
     eta0 = Options['eta0'] if Options and 'eta0' in Options else DefaultOpt['eta0']
     omega0 = Options['omega0'] if Options and 'omega0' in Options else DefaultOpt['omega0']
     betaw = Options['betaw'] if Options and 'betaw' in Options else DefaultOpt['betaw']
-
     pop_size = Options['pop_size'] if Options and 'pop_size' in Options else min(20 * Problem.Variables, 200)
     elite_prop = Options['elite_prop'] if Options and 'elite_prop' in Options else DefaultOpt['elite_prop']
     tour_size = Options['tour_size'] if Options and 'tour_size' in Options else DefaultOpt['tour_size']
     pcross = Options['pcross'] if Options and 'pcross' in Options else DefaultOpt['pcross']
     icross = Options['icross'] if Options and 'icross' in Options else DefaultOpt['icross']
-
     pmut = Options['pmut'] if Options and 'pmut' in Options else 1 / Problem.Variables
-
     imut = Options['imut'] if Options and 'imut' in Options else DefaultOpt['imut']
     cp_ga_test = Options['cp_ga_test'] if Options and 'cp_ga_test' in Options else DefaultOpt['cp_ga_test']
 
@@ -157,12 +146,6 @@ def HGPSAL(Problem, Options=None, *args):
     Problem.m = len(ceq)
     Problem.p = len(c)
 
-    # # DEBUG ONLY
-    # if opt['verbose']:
-    #     print('Initial guess:')
-    #     print(x)
-    # # -----------
-
     if Problem.m == 0:
         alg.lmbd = []
     else:
@@ -203,8 +186,6 @@ def HGPSAL(Problem, Options=None, *args):
     stats.c = np.array(c) if len(np.array(c)) != 0 else []
     stats.ceq = np.array(ceq) if len(np.array(ceq)) != 0 else []
 
-    # stats.history = {}
-    # d_it = {}
     global_search = True
     Opt = {}
     # initialize stats.history with column names
@@ -213,8 +194,6 @@ def HGPSAL(Problem, Options=None, *args):
         # {1: {'Iter': None, 'fx rGA': None, 'nf rGA': None, 'fx HJ': None, 'nf HJ': None}}
         stats.exit += 1
         i = stats.exit
-        # d_it['Iter'] = stats.extit
-        # stats.history[stats.extit + 1] = d_it
 
         # GENERALIZED rGA---------------------
         Probl = copy.copy(Problem)
@@ -222,9 +201,7 @@ def HGPSAL(Problem, Options=None, *args):
 
         if global_search:
             InitialPopulation = x
-
             # InitialPopulation.x[0] = x
-
             Opt['PopSize'] = pop_size
             Opt['EliteProp'] = elite_prop
             Opt['TourSize'] = tour_size
@@ -241,20 +218,8 @@ def HGPSAL(Problem, Options=None, *args):
             x, fval, RunData = rGA(Probl, InitialPopulation, Opt, Problem, alg)
             stats.objfun += RunData.ObjFunCounter
             fx_ = fval
-            # d_it['fx rGA'] = fval
-            # stats.history[stats.extit + 1] = d_it
             nF_ = RunData.ObjFunCounter
-            # d_it['nf rGA'] = RunData.ObjFunCounter
-            # stats.history[stats.extit + 1] = d_it
 
-            # print(stats.history)
-        #     # global_search=0
-        #     if opt.verbose:
-        #         print('GA external it: %d' % stats.extit)
-        #         print(x)
-        #         print(fval)
-        #         print(RunData)
-        #
         Opt['MaxIter'] = maxit
         Opt['MaxObj'] = max_objfun
         Opt['DeltaTol'] = alg.epsilon
@@ -262,17 +227,9 @@ def HGPSAL(Problem, Options=None, *args):
         x, fval, Rundata = HJ(Probl, x, alg.delta, Options, Problem, alg)
         stats.objfun += Rundata.ObjFunCounter
         fx_H = fval
-        # d_it['fx HJ'] = fval
-        # stats.history[stats.extit + 1] = d_it
         nF_H = Rundata.ObjFunCounter
-        # d_it['nf HJ'] = Rundata.ObjFunCounter
-        # stats.history[stats.extit + 1] = d_it
+
         stats.history.append((i, fx_, nF_, fx_H, nF_H))
-        # if opt.verbose:
-        #     print('HJ external it: %d' % stats.extit)
-        #     print(x)
-        #     print(fval)
-        #     print(Rundata)
 
         Value = penalty2(Problem, x, alg)
         c = Value.c
@@ -288,13 +245,6 @@ def HGPSAL(Problem, Options=None, *args):
         if len(ceq):
             np.append(stats.ceq, ceq)
 
-        # if opt.verbose:
-        #     print(x)
-        #     print(fx)
-        #     print(c)
-        #     print(ceq)
-        #     print(la)
-        # # ------------------------------------
         if np.size(alg.lmbd) == 0 and np.size(alg.delta) == 0:
             break
 
@@ -310,11 +260,6 @@ def HGPSAL(Problem, Options=None, *args):
             print(v)
         else:
             v = 0
-        # max_i = max(abs(ceq)) if ceq else 0
-        # v = np.maximum(max(c), max(alg.ldelta * abs(c))) if c else 0
-
-        # if not max_i:
-        #     max_i = 0
 
         norma_lambda = np.linalg.norm(alg.lmbd)
         norma_x = np.linalg.norm(x)
@@ -385,4 +330,4 @@ myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
 
 #
 #
-# print(HGPSAL(myProblem))
+print(HGPSAL(myProblem)[4])
