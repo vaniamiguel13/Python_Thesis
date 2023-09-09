@@ -1,5 +1,5 @@
 class Problem:
-    def __init__(self, Variables, ObjFunction, LB, UB, Constraints=None, x0=None, Variables_C = 1, Variables_Ceq = 1):
+    def __init__(self, Variables, ObjFunction, LB, UB, Constraints=None, x0=None, Variables_C=1, Variables_Ceq=1):
         self.Variables = Variables
         self.ObjFunction = ObjFunction
         self.LB = LB
@@ -40,4 +40,3 @@ class ProblemStatistics:
         self.Mean = []
         self.Std = []
         self.Time = 0
-

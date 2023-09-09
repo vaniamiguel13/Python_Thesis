@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from HGPSAL.HGPSAL.AUX_Class.Population_C import Popul
+from HGPSAL.HGPSAL.AUX_Class.Problem_C import *
 
 def Bounds(X, L, U):
     for _ in range(len(X)):
@@ -135,8 +136,7 @@ def genetic_operator(Problem, parent_chromosome, pc, pm, mu, mum):
 
 def rGA(Problem, InitialPopulation=None, Options=None, *args):
     DefaultOpt = {'MaxObj': 2000, 'MaxGen': 2000, 'PopSize': 40, 'EliteProp': 0.1,
-                  'TourSize': 2, 'Pcross': 0.9, 'Icross': 20, 'Pmut': 0.1, 'Imut': 20,
-                  'CPTolerance': 1.0e-6, 'CPGenTest': 0.01, 'Verbosity': False}
+                  'TourSize': 2, 'Pcross': 0.9, 'Icross': 20, 'Pmut': 0.1, 'Imut': 20}
 
     MaxGenerations = Options['MaxGen'] if Options and 'MaxGen' in Options else DefaultOpt['MaxGen']
     MaxEvals = Options['MaxObj'] if Options and 'MaxObj' in Options else DefaultOpt['MaxObj']
@@ -221,3 +221,26 @@ def rGA(Problem, InitialPopulation=None, Options=None, *args):
 
     return BestChrom, BestChromObj, RunData
 
+
+def fobj(x):
+    """
+    Sphere Function
+
+    Input:
+    x (list of floats) : the point at which to evaluate the sphere function
+
+    Output:
+    (float) : the value of the sphere function at x
+    """
+    return sum(xi ** 2 for xi in x)
+
+
+Variables = 2
+ObjFunction = fobj
+LB = [-15, -15]
+UB = [15, 15]
+Problem = Problem(Variables, ObjFunction, LB, UB)  # Assuming ProblemClass is the class defining your problem
+Options = {'Pmut': 1/Variables, 'MaxGen': 1000}
+x, fx, S = rGA(Problem, [10, 50], Options)
+
+print(type(fx))

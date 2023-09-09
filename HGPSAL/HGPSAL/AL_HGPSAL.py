@@ -39,8 +39,8 @@ def HGPSAL(Problem, Options=None, *args):
                   'pop_size': 40, 'elite_prop': 0.1, 'tour_size': 2, 'pcross': 0.9, 'icross': 20, 'pmut': 0.1,
                   'imut': 20,
                   'gama': 1, 'delta': 1, 'teta': 0.5, 'eta_asterisco': 1.0e-2, 'epsilon_asterisco': 1.0e-6,
-                  'cp_ga_test': 0.1, 'cp_ga_tol': 1.0e-6, 'delta_tol': 1e-6, 'maxit': 200, 'maxet': 200,
-                  'max_objfun': 20000, 'verbose': False}
+                  'cp_ga_test': 0.1, 'cp_ga_tol': 1.0e-6, 'delta_tol': 1e-6, 'maxit': 100, 'maxet': 200,
+                  'max_objfun': 20000}
 
     # With no arguments just print an error
     if Problem is None:
@@ -88,7 +88,7 @@ def HGPSAL(Problem, Options=None, *args):
     miu0 = Options['miu0'] if Options and 'miu0' in Options else DefaultOpt['miu0']
     maxit = Options['maxit'] if Options and 'maxit' in Options else DefaultOpt['maxit']
     maxet = Options['maxet'] if Options and 'maxet' in Options else DefaultOpt['maxet']
-    verbose = Options['verbose'] if Options and 'verbose' in Options else DefaultOpt['verbose']
+    # verbose = Options['verbose'] if Options and 'verbose' in Options else DefaultOpt['verbose']
     teta = Options['teta'] if Options and 'teta' in Options else DefaultOpt['teta']
     miu_min = Options['miu_min'] if Options and 'miu_min' in Options else DefaultOpt['miu_min']
     alfaw = Options['alfaw'] if Options and 'alfaw' in Options else DefaultOpt['alfaw']
@@ -213,7 +213,7 @@ def HGPSAL(Problem, Options=None, *args):
             Opt['CPGenTest'] = cp_ga_test
             Opt['MaxGen'] = maxit
             Opt['MaxObj'] = max_objfun
-            Opt['Verbosity'] = verbose
+            # Opt['Verbosity'] = verbose
 
             x, fval, RunData = rGA(Probl, InitialPopulation, Opt, Problem, alg)
             stats.objfun += RunData.ObjFunCounter
@@ -299,35 +299,52 @@ def HGPSAL(Problem, Options=None, *args):
     return x, fx, c, ceq, la, stats
 
 
-Variables = 2
-
-
-def Rastrigin(x):
-    f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
-    return f
-
-
-def Rast_constr(x):
-    c = [(x[0] - 25) ** 2 + (x[1] - 25) ** 2 - 100]
-    ceq = [x[0] + x[1] - 7, x[1] * x[0] - 7]
-    # ceq = []
-    # c = []
-    return np.array(c), np.array(ceq)
-
-
-LB = [-5, -5]
-UB = [5, 5]
-
-# InitialPopulation = [
-#     {'x': [-3, 2]},
-#     {'x': [1, -4]},
-#     {'x': [-2, 3]}
-# ]
-
-myProblem = Problem(Variables, Rastrigin, LB, UB, Rast_constr, x0=[100, 50])
+# Variables = 2
+#
+#
+# def Rastrigin(x):
+#     f = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
+#     return f
+#
+#
+# def Rast_constr(x):
+#     c = [(x[0] - 25) ** 2 + (x[1] - 25) ** 2 - 100]
+#     ceq = [x[0] + x[1] - 7, x[1] * x[0] - 7]
+#     # ceq = []
+#     # c = []
+#     return np.array(c), np.array(ceq)
+#
+#
+# LB = [-5, -5]
+# UB = [5, 5]
+#
+# def rosenbrock(x, a=1, b=100):
+#     return (a - x[0]) ** 2 + b * (x[1] - x[0] ** 2) ** 2
+#
+# def constr(x):
+#     c = [x[0]**2 + x[1]**2 - 1]
+#     ceq = []
+#     return np.array(c), np.array(ceq)
+#
+# myProblem = Problem(Variables, rosenbrock, LB, UB, constr, x0=[100, 50])
 # InitialGuess1 = InitialGuess(np.array([0, 0]))
 # InitialGuess2 = InitialGuess(np.array([1, 1]))
 
 #
 #
-print(HGPSAL(myProblem)[4])
+# print(HGPSAL(myProblem)[0])
+# def func(x):
+#     return x[0] ** 2 + x[1] ** 2
+#
+#
+# def constraints(x):
+#     c1 = [x[0] ** 2 + x[1] ** 2 - 1]
+#     ceq1 = [x[0] + x[1] - 2]
+#     return np.array(c1), np.array(ceq1)
+#
+#
+# problem = Problem(2, func, [-5, -5], [5, 5], constraints)
+#
+# x, fx, c, ceq = HGPSAL(problem)[0:4]
+# print(x, fx, c, ceq)
+#

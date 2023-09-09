@@ -74,6 +74,7 @@ def HJ(Problem, x0, delta = None, Options = None, *args):
     if Options is None:
         Options = {}
 
+
     MaxGenerations = Options['MaxIter'] if Options and 'MaxIter' in Options else DefaultOpt['MaxIter']
     MaxEvals = Options['MaxObj'] if Options and 'MaxObj' in Options else DefaultOpt['MaxObj']
     Delta = Options['DeltaTol'] if Options and 'DeltaTol' in Options else DefaultOpt['DeltaTol']
@@ -119,3 +120,28 @@ def HJ(Problem, x0, delta = None, Options = None, *args):
     RunData = Problem.Stats
 
     return x, fx, RunData
+
+from HGPSAL.HGPSAL.AUX_Class.Problem_C import *
+def fobj(x):
+    """
+    Sphere Function
+
+    Input:
+    x (list of floats) : the point at which to evaluate the sphere function
+
+    Output:
+    (float) : the value of the sphere function at x
+    """
+    return sum(xi ** 2 for xi in x)
+# Variables = 2
+# ObjFunction = fobj
+# LB = [-15, -15]
+# UB = [15, 15]
+# Problem = Problem(Variables, ObjFunction, LB, UB)  # Assuming ProblemClass is the class defining your problem
+#
+#
+# x0 = np.array([0, 0])
+#
+# Options = {'MaxIter': 300}
+#
+# x, fx, S = HJ(Problem, x0, np.array([30, 40]), Options)
