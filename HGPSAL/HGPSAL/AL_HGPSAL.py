@@ -31,6 +31,61 @@ def mega_(lambda_, ldelta, miu, teta_tol):
 
 
 def HGPSAL(Problem, Options=None, *args):
+    """HGPSAL - Hybrid Genetic Pattern Search Augmented Lagrangian
+
+    Inputs:
+
+    - Problem
+        - Problem.Variables - Dimension of the problem
+        - Problem.x0 - Initial guess (random if x0 is empty)
+        - Problem.LB - Problem lower bounds
+        - Problem.UB - Problem upper bounds
+        - Problem.ObjFunction - Objective function
+        - Problem.Constraints - Constraints function
+    - options - Algorithm options dictionary (see below)
+    - *args - Extra parameters for objective and constraint functions
+
+    Options:
+
+    Augmented Lagrangian:
+        - lambda_min - Minimum Lagrange multiplier value for equality constraints
+        - lambda_max - Maximum Lagrange multiplier value for equality constraints
+        - teta_tol - Maximum Lagrange multiplier value for inequality constraints
+        - miu0 - Initial penalty parameter
+        - miu_min - Minimum penalty parameter
+        - csi - Reduction factor for miu update
+        - eta0 - Initial tolerance value
+        - omega0, alfaw, alfa_eta, betaw, beta_eta, gama1, teta_miu - Other AL params
+
+    rGA:
+        - pop_size - Population size
+        - elite_prop - Proportion of elite individuals
+        - tour_size - Tournament size for selection
+        - pcross - SBX crossover probability
+        - icross - SBX crossover distribution index
+        - pmut - Mutation probability
+        - imut - Mutation distribution index
+
+    HJ:
+        - gama, delta, teta - HJ parameters
+
+    Stopping criteria:
+        - CPTolerance - Tolerance for best individual
+        - CPGenTest - Gap for stopping test
+        - delta_tol - HJ stopping tolerance
+        - maxit - Maximum internal iterations
+        - maxet - Maximum external iterations
+        - max_objfun - Maximum objective evaluations
+
+    Returns:
+        - x - Solution
+        - fx - Objective value
+        - c - Constraint violation
+        - ceq - Equality constraint violation
+        - la - Augmented Lagrangian value
+        - stats - Execution statistics
+    """
+
     DefaultOpt = {'lambda_min': -1e12, 'lambda_max': 1e12, 'teta_tol': 1e12, 'miu_min': 1e-12, 'miu0': 1, 'csi': 0.5,
                   'eta0': 1, 'ffeas': 1, 'gps': 1, 'niu': 1.0, 'zeta': 0.001, 'epsilon1': 1e-4, 'epsilon2': 1e-8,
                   'suficient': 1e-4, 'method': 0,

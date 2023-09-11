@@ -135,6 +135,51 @@ def genetic_operator(Problem, parent_chromosome, pc, pm, mu, mum):
 
 
 def rGA(Problem, InitialPopulation=None, Options=None, *args):
+    """rGA: Real-coded Genetic Algorithm for nonlinear function minimization
+        with bound constraints.
+
+        Inputs:
+
+        - Problem: Structure with problem definitions
+            - Problem.Variables: Number of variables
+            - Problem.ObjFunction: Objective function name
+            - Problem.LB: Lower bounds
+            - Problem.UB: Upper bounds
+        - InitialPopulation: List of structures with initial guesses
+        - Options: Options dictionary (see below)
+        - *args: Extra parameters for objective function
+
+        Options:
+            - MaxObj: Max objective evaluations
+            - MaxGen: Max generations
+            - PopSize: Population size
+            - EliteProp: Proportion of elite individuals
+            - TourSize: Tournament size
+            - Pcross: Crossover probability
+            - Icross: Crossover distribution index
+            - Pmut: Mutation probability
+            - Imut: Mutation distribution index
+            - CPTolerance: Tolerance for best individual
+            - CPGenTest: Gap for stopping test
+            - Verbosity: Verbosity level
+
+        Returns:
+            - BestChrom: Best solution
+            - BestChromObj: Objective value
+            - RunData: Execution statistics
+
+        Example:
+
+            Problem.Variables = 2
+            Problem.ObjFunction = defined objective function
+            Problem.LB = [-15, -15]
+            Problem.UB = [15, 15]
+            Options.Pmut = 1/Problem.Variables
+            Options.MaxGen = 1000
+
+            x, fx, S = rga(Problem, [], Options)
+
+        """
     DefaultOpt = {'MaxObj': 2000, 'MaxGen': 2000, 'PopSize': 40, 'EliteProp': 0.1,
                   'TourSize': 2, 'Pcross': 0.9, 'Icross': 20, 'Pmut': 0.1, 'Imut': 20}
 

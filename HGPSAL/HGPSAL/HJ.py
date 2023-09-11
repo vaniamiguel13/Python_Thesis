@@ -59,6 +59,29 @@ def Coordinate_Search(Problem, s, delta, e, x, min, rho, *args):
 
 def HJ(Problem, x0, delta = None, Options = None, *args):
 
+    """Generalized Hooke and Jeeves algorithm.
+
+    Inputs:
+
+    - Problem:
+        - Problem.ObjFunction: Objective function
+        - Problem.Variables: Dimension
+        - Problem.LB: Lower bounds
+        - Problem.UB: Upper bounds
+    - x0: Initial guess
+    - delta: Initial step size
+
+    Returns:
+        - x: Solution
+        - fx: Objective value
+        - RunData: Execution statistics
+
+    The algorithm searches for a minimizer x of the
+    objective function Problem.ObjFunction by taking
+    exploratory steps from the initial guess x0 using
+    step size delta.
+
+    """
     DefaultOpt = {'MaxObj': 2000, 'MaxIter': 200, 'DeltaTol': 1.0e-6, 'Theta': 0.5}
     x0 = np.array(x0)
 
@@ -82,7 +105,7 @@ def HJ(Problem, x0, delta = None, Options = None, *args):
 
     tic()
 
-    Problem.Stats.Algoritm = 'Hooke and Jeeves';
+    Problem.Stats.Algoritm = 'Hooke and Jeeves'
     Problem.Stats.Iterations = 0
     Problem.Stats.ObjFunCounter = 0
 
