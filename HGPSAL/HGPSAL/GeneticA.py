@@ -13,8 +13,11 @@ def Bounds(X, L, U):
 
 
 def ObjEval(P, x, *args):
+
     P.Stats.ObjFunCounter += 1
     return P, P.ObjFunction(x, *args)
+
+
 
 
 def InitPopulation(Problem, InitialPopulation, Size, *args):
@@ -32,7 +35,7 @@ def InitPopulation(Problem, InitialPopulation, Size, *args):
         x = InitialPopulation
         Population.x[i, :] = Bounds(x, Problem.LB[:Problem.Variables], Problem.UB[:Problem.Variables])
         Problem, Population.f[i] = ObjEval(Problem, Population.x[i, :], *args)
-
+        print(Population.f[i])
     # Randomly generate the remaining population
     for i in range(len(InitialPopulation)+1, Size):
         Population.x[i, :] = np.array(Problem.LB[:Problem.Variables]) + \

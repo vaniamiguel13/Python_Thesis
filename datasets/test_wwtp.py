@@ -301,4 +301,4 @@ myProblem1 = Problem(Variables, cost_function, LB, UB, constr_function, x0=x0, V
 opt= {'maxit': 100, 'max_objfun': 2000}
 MEGA=(HGPSAL(myProblem1, opt))
 print(MEGA)
-print(MEGA[5])
+print(MEGA[5].objfun)

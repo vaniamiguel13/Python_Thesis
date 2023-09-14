@@ -85,6 +85,15 @@ def HGPSAL(Problem, Options=None, *args):
         - la - Augmented Lagrangian value
         - stats - Execution statistics
     """
+    # DefaultOpt = {'lambda_min': -1e12, 'lambda_max': 1e12, 'teta_tol': 1e12, 'miu_min': 1e-12, 'miu0': 1, 'csi': 0.5,
+    #               'eta0': 1, 'omega0': 1, 'alfaw': 0.9, 'alfa_eta': 0.9 * 0.9, 'betaw': 0.9, 'beta_eta': 0.5 * 0.9,
+    #               'gama1': 0.5,
+    #               'teta_miu': 0.5,
+    #               'pop_size': 40, 'elite_prop': 0.1, 'tour_size': 2, 'pcross': 0.9, 'icross': 20, 'pmut': 0.1,
+    #               'imut': 20,
+    #               'gama': 1, 'delta': 1, 'teta': 0.5, 'eta_asterisco': 1.0e-2, 'epsilon_asterisco': 1.0e-6,
+    #               'cp_ga_test': 0.1, 'maxit': 1000, 'maxet': 2000,
+    #               'max_objfun': 200000}
 
     DefaultOpt = {'lambda_min': -1e12, 'lambda_max': 1e12, 'teta_tol': 1e12, 'miu_min': 1e-12, 'miu0': 1, 'csi': 0.5,
                   'eta0': 1, 'ffeas': 1, 'gps': 1, 'niu': 1.0, 'zeta': 0.001, 'epsilon1': 1e-4, 'epsilon2': 1e-8,
@@ -200,16 +209,22 @@ def HGPSAL(Problem, Options=None, *args):
 
     Problem.m = len(ceq)
     Problem.p = len(c)
+    print(Problem.p)
 
     if Problem.m == 0:
         alg.lmbd = []
     else:
         alg.lmbd = np.ones(Problem.m)
 
+    # if Problem.p == 0:
+    #     alg.ldelta = []
+    # else:
+    #     alg.ldelta = np.ones((1, Problem.p))
+
     if Problem.p == 0:
-        alg.ldelta = []
+        alg.ldelta = np.zeros((1, 0))
     else:
-        alg.ldelta = np.ones((1, Problem.p))
+        alg.ldelta = np.zeros((1, Problem.p))
 
     # Initialize
 
@@ -312,14 +327,15 @@ def HGPSAL(Problem, Options=None, *args):
         if c.any():
 
             v = np.maximum(np.max(c), np.max(alg.ldelta * np.abs(c)))
-            print(v)
+
         else:
             v = 0
 
         norma_lambda = np.linalg.norm(alg.lmbd)
         norma_x = np.linalg.norm(x)
 
-        alg.ldelta = np.maximum(lambda_min, np.minimum(np.maximum(0, alg.ldelta + c / alg.miu), lambda_max))
+        for i in range(Problem.p):
+            alg.ldelta = np.maximum(lambda_min, np.minimum(np.maximum(0, alg.ldelta + c / alg.miu), lambda_max))
 
         if max_i <= alg.eta * (1 + norma_x) and v <= alg.eta * (1 + norma_lambda):
 
@@ -403,3 +419,44 @@ def HGPSAL(Problem, Options=None, *args):
 # x, fx, c, ceq = HGPSAL(problem)[0:4]
 # print(x, fx, c, ceq)
 #
+def Rast(x):
+    z = 20 + x[0] ** 2 + x[1] ** 2 - 10 * (np.cos(2 * np.pi * x[0]) + np.cos(2 * np.pi * x[1]))
+    return z
+
+
+def rast_constr(x):
+    """Rastreich constraints"""
+
+    c = [(x[0] - 25) ** 2 + (x[1] - 25) ** 2 - 100]
+
+    # ceq = [x[0] + x[1] - 100]
+    ceq =[]
+
+    return np.array(c), np.array(ceq)
+
+#
+# LB = [-5, -5]
+# UB = [5, 5]
+# myProblem = Problem(2, Rast, LB, UB, rast_constr)
+# print(HGPSAL(myProblem))
+def func(x):
+    return 100 * (x[1] - x[0] ** 2) ** 2 + (1 - x[0]) ** 2
+
+
+def constraints(x):
+    c = np.empty(2)
+    ceq = np.empty(1)
+    c[0] = 2 * x[0] + 2 * x[1] - 10 # inequality constraint
+    c[1] = x[0] ** 2 + x[1] ** 2 - 1  # inequality constraint
+
+
+    ceq[0] = x[0] + 3 * x[1] - 5 # equality constraint
+    # ceq[1]= x[0] + 20 * x[1] - 30  # equality constraint
+
+    return np.array(c), np.array(ceq)
+
+
+problem = Problem(2, func, [-5, -5], [5, 5], constraints)
+
+x, fx, c, ceq = HGPSAL(problem)[0:4]
+print(x, fx, c, ceq)

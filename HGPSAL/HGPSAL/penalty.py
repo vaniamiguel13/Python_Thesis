@@ -9,18 +9,33 @@ class Val:
         self.la = []
 
 
+# def penalty2(Problem, x, alg):
+#     # Compute objective function
+#     Value = Val(ObjEval(Problem, x), ConsEval(Problem, x)[0], (ConsEval(Problem, x))[1])
+#     # Compute all constraints
+#     term1 = sum(alg.lmbd * Value.ceq)
+#     term2 = sum(Value.ceq ** 2)
+#     term3 = sum(np.array(np.maximum(0, alg.ldelta + Value.c / alg.miu)) ** 2 - np.array(alg.ldelta) ** 2)
+#     Value.la = Value.fx + term1 + term2 / (2 * alg.miu) + alg.miu * term3 / 2
+#
+#     return Value
+
 def penalty2(Problem, x, alg):
-    # Compute objective function
-    Value = Val(ObjEval(Problem, x), ConsEval(Problem, x)[0], (ConsEval(Problem, x))[1])
-    # Compute all constraints
+    # Compute objective and constraints
+    Value = Val(ObjEval(Problem, x), ConsEval(Problem, x)[0], ConsEval(Problem, x)[1])
+
+    # Compute equality constraint terms
     term1 = sum(alg.lmbd * Value.ceq)
     term2 = sum(Value.ceq ** 2)
-    term3 = sum(np.array(np.maximum(0, alg.ldelta + Value.c / alg.miu)) ** 2 - np.array(alg.ldelta) ** 2)
+
+    # Compute inequality constraint term
+    term3 = 0
+    for i in range(Problem.p):
+        term3 += np.maximum(0, alg.ldelta[0, i] + Value.c[i] / alg.miu) ** 2 - alg.ldelta[0, i] ** 2
+
     Value.la = Value.fx + term1 + term2 / (2 * alg.miu) + alg.miu * term3 / 2
 
     return Value
-
-
 def ObjEval(Problem, x, *args):
     ObjValue = Problem.ObjFunction(x)
     return ObjValue
