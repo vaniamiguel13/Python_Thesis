@@ -254,16 +254,16 @@ def RankPopulation(Population, elite, sigma, NormType):
     for i in range(len(IP)):
         Population.Rank[IP[i]] = rank
 
-        if isinstance(Population.c[i], np.int32) and isinstance(Population.ceq[i], np.int32):
+        if isinstance(Population.c[i], np.int64) and isinstance(Population.ceq[i], np.int64):
             Population.Fitness[IP[i]] = fk + np.linalg.norm(np.maximum(0, [Population.c[i]]),
                                                             NormType) + np.linalg.norm(
                 np.abs([Population.ceq[i]]), NormType)
-        elif isinstance(Population.c[i], np.int32) and isinstance(Population.ceq[i], np.ndarray):
+        elif isinstance(Population.c[i], np.int64) and isinstance(Population.ceq[i], np.ndarray):
             Population.Fitness[IP[i]] = fk + np.linalg.norm(np.maximum(0, [Population.c[i]]),
                                                             NormType) + np.linalg.norm(
                 np.abs(Population.ceq[i]), NormType)
 
-        elif isinstance(Population.c[i], np.ndarray) and isinstance(Population.ceq[i], np.int32):
+        elif isinstance(Population.c[i], np.ndarray) and isinstance(Population.ceq[i], np.int64):
             Population.Fitness[IP[i]] = fk + np.linalg.norm(np.maximum(0, [Population.c[i]]),
                                                             NormType) + np.linalg.norm(
                 np.abs([Population.ceq[i]]), NormType)
@@ -272,6 +272,8 @@ def RankPopulation(Population, elite, sigma, NormType):
             Population.Fitness[IP[i]] = (np.linalg.norm(np.abs(Population.ceq[i]), NormType))
             Population.Fitness[IP[i]] += float(fk)
             Population.Fitness[IP[i]] += np.linalg.norm(np.maximum(0, (Population.c[i])), NormType)
+
+
 
     return Population
 

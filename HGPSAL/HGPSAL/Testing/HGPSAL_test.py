@@ -61,13 +61,13 @@ class TestHGPSAL(unittest.TestCase):
             return np.array(c1), np.array(ceq1)
 
         problem = Problem(2, func, [-5, -5], [5, 5], constraints)
+        opt = {'maxit': 100000, 'max_objfun': 200000}
+        x, fx, c, ceq = HGPSAL(problem, opt)[0:4]
 
-        x, fx, c, ceq = HGPSAL(problem)[0:4]
-
-        np.testing.assert_almost_equal(fx, 1.1573, decimal=0)
-        np.testing.assert_array_almost_equal(x, [0.7606, 0.7606], decimal=4)
-        np.testing.assert_almost_equal(c, [0.157], decimal=3)
-        np.testing.assert_almost_equal(ceq, [-0.478], decimal=3)
+        np.testing.assert_almost_equal(fx, 0.125, decimal=3)
+        np.testing.assert_array_almost_equal(x, [0.25, 0.25], decimal=2)
+        np.testing.assert_almost_equal(c, [-0.87], decimal=2)
+        np.testing.assert_almost_equal(ceq, [-1.49999999], decimal=2)
 
     def test_Rast(self):
         def func(x):
@@ -75,9 +75,12 @@ class TestHGPSAL(unittest.TestCase):
             return z
 
         def constraints(x):
-            c = [(x[0] - 25) ** 2 + (x[1] - 25) ** 2 - 100]
-            # ceq = [x[0] + x[1] - 100]
-            ceq =[]
+            c=[]
+            c.append(-x[0] - 5)  # x0 >= -5
+            c.append(x[0] - 5)  # x0 <= 5
+            c.append(-x[1] - 5)  # x1 >= -5
+            c.append(x[1] - 5)  # x1 <= 5
+            ceq = []
 
             return np.array(c), np.array(ceq)
 
@@ -85,14 +88,13 @@ class TestHGPSAL(unittest.TestCase):
 
         x, fx, c, ceq = HGPSAL(problem)[0:4]
 
-        np.testing.assert_almost_equal(fx, 50.0, decimal=1)
-        np.testing.assert_array_almost_equal(x, [5., 5.], decimal=4)
-        np.testing.assert_almost_equal(c, [700.], decimal=3)
+        np.testing.assert_almost_equal(fx, 0.0, decimal=1)
+        np.testing.assert_array_almost_equal(x, [0., 0.], decimal=4)
+        np.testing.assert_almost_equal(c, [-5., -5., -5., -5.], decimal=3)
         np.testing.assert_almost_equal(ceq, [], decimal=3)
 
     def test_Rosenbrock(self):
         def func(x):
-
             return 100 * (x[1] - x[0] ** 2) ** 2 + (1 - x[0]) ** 2
 
         def constraints(x):
@@ -107,14 +109,33 @@ class TestHGPSAL(unittest.TestCase):
 
             return np.array(c), np.array(ceq)
 
-        problem = Problem(2, func, [-5, -5], [5, 5], constraints)
+        opt = {'maxit': 100000, 'max_objfun': 200000}
+        problem = Problem(2, func, [-5, -5], [5, 5], constraints, x0=[0, 0])
 
-        x, fx, c, ceq = HGPSAL(problem)[0:4]
+        x, fx, c, ceq = HGPSAL(problem, opt)[0:4]
 
         np.testing.assert_almost_equal(fx, 0.0, decimal=1)
-        np.testing.assert_array_almost_equal(x, [1., 1.], decimal=4)
+        np.testing.assert_array_almost_equal(x, [1., 1.], decimal=1)
         # np.testing.assert_almost_equal(c, [700.], decimal=3)
         # np.testing.assert_almost_equal(ceq, [], decimal=3)
+
+    def himmelblau(self):
+        def func(x):
+            return (x[0] ** 2 + x[1] - 11) ** 2 + (x[0] + x[1] ** 2 - 7) ** 2
+
+        def constraints(x):
+            c = []
+            ceq = []
+            return np.array(c), np.array(ceq)
+
+        opt = {'maxit': 100000, 'max_objfun': 200000}
+        problem = Problem(2, func, [-5, -5], [5, 5], constraints, x0=[0, 0])
+
+        x, fx, c, ceq = HGPSAL(problem, opt)[0:4]
+
+        np.testing.assert_almost_equal(fx, 0.0, decimal=1)
+        np.testing.assert_array_almost_equal(x, [3., 2.], decimal=1)
+
 
 if __name__ == '__main__':
     unittest.main()

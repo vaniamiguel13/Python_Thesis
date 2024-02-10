@@ -210,9 +210,9 @@ def MegaCon(Problem, InitialPopulation = None, Options= None, *args):
                     print(
                         f"Gen: {Problem.Stats.GenCounter}  No. points in 1st front = {Problem.Stats.N1Front[Problem.Stats.GenCounter]}  Number of fronts = {Problem.Stats.NFronts[Problem.Stats.GenCounter]}")
 
-    print(Problem.Stats.GenCounter)
-    print(Problem.Stats.ObjFunCounter)
-    print(Problem.Stats.ConCounter)
+    # print(Problem.Stats.GenCounter)
+    # print(Problem.Stats.ObjFunCounter)
+    # print(Problem.Stats.ConCounter)
     toc()
 
     if Problem.Stats.GenCounter >= MaxGenerations or Problem.Stats.ObjFunCounter >= MaxEvals:
